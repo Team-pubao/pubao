@@ -105,10 +105,10 @@ HYPOTHESIS_IMAGES = {
 MEDALS = ["1위", "2위", "3위", "4위", "5위"]
 
 CHART_FONT = "Apple SD Gothic Neo, Pretendard, Malgun Gothic, sans-serif"
-CHART_PRIMARY = "#0a0a0a"
-CHART_ACCENT = "#1d4ed8"
-CHART_MUTED = "#a3a3a3"
-CHART_INK = "#0a0a0a"
+CHART_PRIMARY = "#1d4ed8"
+CHART_ACCENT = "#6366f1"
+CHART_MUTED = "#9ca3af"
+CHART_INK = "#111827"
 
 
 def apply_chart_theme(fig: go.Figure, *, height: int | None = None, show_legend: bool = True) -> go.Figure:
@@ -127,12 +127,12 @@ def apply_chart_theme(fig: go.Figure, *, height: int | None = None, show_legend:
         hoverlabel=dict(font=dict(family=CHART_FONT, size=13), bgcolor="#0f172a", font_color="#ffffff"),
     )
     fig.update_xaxes(
-        showgrid=True, gridcolor="#f0f0f0", zeroline=False, linecolor="#e5e5e5",
-        tickfont=dict(size=12, color="#525252"), title_font=dict(size=12, color="#737373"),
+        showgrid=True, gridcolor="#f3f4f6", zeroline=False, linecolor="#e5e7eb",
+        tickfont=dict(size=12, color="#4b5563"), title_font=dict(size=12, color="#6b7280"),
     )
     fig.update_yaxes(
-        showgrid=True, gridcolor="#f0f0f0", zeroline=False, linecolor="#e5e5e5",
-        tickfont=dict(size=12, color="#525252"), title_font=dict(size=12, color="#737373"),
+        showgrid=True, gridcolor="#f3f4f6", zeroline=False, linecolor="#e5e7eb",
+        tickfont=dict(size=12, color="#4b5563"), title_font=dict(size=12, color="#6b7280"),
     )
     if height is not None:
         fig.update_layout(height=height)
@@ -152,9 +152,9 @@ def inject_css() -> None:
             font-family: "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", "Noto Sans KR", -apple-system, sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            color: #0a0a0a;
+            color: #171717;
         }
-        .stApp { background: #fafafa; }
+        .stApp { background: #f9fafb; }
         .block-container {
             padding-top: 2rem;
             padding-bottom: 4rem;
@@ -165,26 +165,26 @@ def inject_css() -> None:
         .hero {
             margin-bottom: 2rem;
             padding-bottom: 1.5rem;
-            border-bottom: 1px solid #e5e5e5;
+            border-bottom: 1px solid #e5e7eb;
         }
         .hero .eyebrow {
             font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 0.14em;
-            color: #737373;
-            font-weight: 600;
+            color: #1d4ed8;
+            font-weight: 700;
             margin-bottom: 0.65rem;
         }
         .hero h1 {
-            color: #0a0a0a;
-            font-size: 1.95rem;
+            color: #111827;
+            font-size: 1.9rem;
             font-weight: 700;
             margin: 0 0 0.55rem;
-            letter-spacing: -0.028em;
-            line-height: 1.18;
+            letter-spacing: -0.025em;
+            line-height: 1.2;
         }
         .hero p {
-            color: #525252;
+            color: #4b5563;
             margin: 0;
             font-size: 0.95rem;
             line-height: 1.55;
@@ -193,24 +193,24 @@ def inject_css() -> None:
         .hero .meta {
             margin-top: 1.1rem;
             font-size: 0.78rem;
-            color: #a3a3a3;
+            color: #9ca3af;
         }
         .hero .meta span:not(:last-child)::after {
             content: "·";
             margin: 0 0.55rem;
-            color: #d4d4d4;
+            color: #d1d5db;
         }
 
         /* ── Section titles ─────────────────────── */
         .section-title {
-            color: #0a0a0a;
+            color: #111827;
             font-size: 1.12rem;
             font-weight: 700;
             margin: 2rem 0 0.3rem;
             letter-spacing: -0.018em;
         }
         .section-sub {
-            color: #525252;
+            color: #6b7280;
             font-size: 0.86rem;
             margin: 0 0 1.2rem;
             line-height: 1.55;
@@ -219,12 +219,13 @@ def inject_css() -> None:
         /* ── Unified card system ─────────────────── */
         .factor-card, .rank-card, .recommend-card, .info-card {
             background: #ffffff;
-            border: 1px solid #e5e5e5;
-            border-radius: 10px;
-            transition: border-color 0.15s ease;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
         .factor-card:hover, .rank-card:hover, .recommend-card:hover {
-            border-color: #d4d4d4;
+            border-color: #c7d2fe;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
         }
 
         /* Factor card (탐색 모드) */
@@ -241,23 +242,23 @@ def inject_css() -> None:
         .factor-card-title {
             font-size: 0.92rem;
             font-weight: 600;
-            color: #0a0a0a;
+            color: #111827;
             letter-spacing: -0.005em;
         }
         .factor-card-rank {
             font-size: 0.74rem;
-            color: #525252;
+            color: #6b7280;
             font-weight: 500;
             font-variant-numeric: tabular-nums;
         }
         .factor-card-rank strong {
-            color: #0a0a0a;
+            color: #1d4ed8;
             font-weight: 700;
         }
         .factor-card-value {
             font-size: 1.85rem;
             font-weight: 700;
-            color: #0a0a0a;
+            color: #111827;
             line-height: 1.05;
             letter-spacing: -0.03em;
             font-variant-numeric: tabular-nums;
@@ -269,24 +270,24 @@ def inject_css() -> None:
         .factor-card-value-unit {
             font-size: 0.8rem;
             font-weight: 500;
-            color: #a3a3a3;
+            color: #9ca3af;
             letter-spacing: 0;
         }
         .factor-card-sub {
             font-size: 0.78rem;
-            color: #525252;
-            margin: 0 0 0.85rem;
+            color: #6b7280;
+            margin: 0 0 0.9rem;
             line-height: 1.5;
         }
         .factor-card-bar {
-            background: #f0f0f0;
-            height: 4px;
+            background: #eef2f7;
+            height: 5px;
             border-radius: 999px;
             overflow: hidden;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.45rem;
         }
         .factor-card-bar-fill {
-            background: #0a0a0a;
+            background: linear-gradient(90deg, #3b82f6, #6366f1);
             height: 100%;
             border-radius: 999px;
         }
@@ -294,15 +295,15 @@ def inject_css() -> None:
             display: flex;
             justify-content: space-between;
             font-size: 0.7rem;
-            color: #a3a3a3;
-            margin-bottom: 0.65rem;
+            color: #9ca3af;
+            margin-bottom: 0.7rem;
             font-variant-numeric: tabular-nums;
         }
         .factor-card-tag {
             display: inline-flex;
             align-items: center;
             font-size: 0.76rem;
-            color: #525252;
+            color: #4b5563;
             font-weight: 500;
             font-variant-numeric: tabular-nums;
         }
@@ -330,34 +331,34 @@ def inject_css() -> None:
             margin-right: 0.55rem;
             vertical-align: -3px;
         }
-        .rank-card .medal.r1 { background: #b45309; }
-        .rank-card .medal.r2 { background: #737373; }
-        .rank-card .medal.r3 { background: #a16207; }
-        .rank-card .medal.r4, .rank-card .medal.r5 { background: #a3a3a3; }
+        .rank-card .medal.r1 { background: #d97706; }
+        .rank-card .medal.r2 { background: #94a3b8; }
+        .rank-card .medal.r3 { background: #b45309; }
+        .rank-card .medal.r4, .rank-card .medal.r5 { background: #cbd5e1; color: #475569; }
         .rank-card .title {
             font-size: 0.95rem;
             font-weight: 600;
-            color: #0a0a0a;
+            color: #111827;
             margin-bottom: 0.5rem;
             letter-spacing: -0.005em;
         }
         .rank-card .score {
             font-size: 1.65rem;
             font-weight: 700;
-            color: #0a0a0a;
+            color: #1d4ed8;
             line-height: 1.05;
             letter-spacing: -0.03em;
             font-variant-numeric: tabular-nums;
         }
         .rank-card .score-unit {
             font-size: 0.8rem;
-            color: #a3a3a3;
+            color: #9ca3af;
             font-weight: 500;
             margin-left: 0.15rem;
         }
         .rank-card .sub {
             font-size: 0.76rem;
-            color: #525252;
+            color: #6b7280;
             margin-top: 0.5rem;
             line-height: 1.5;
         }
@@ -368,27 +369,27 @@ def inject_css() -> None:
             margin-bottom: 0.5rem;
         }
         .recommend-card b {
-            color: #0a0a0a;
+            color: #111827;
             font-size: 0.95rem;
             font-weight: 600;
             letter-spacing: -0.005em;
         }
         .recommend-card .score-chip {
             display: inline-block;
-            color: #525252;
+            color: #6b7280;
             font-size: 0.76rem;
             font-weight: 500;
             margin-left: 0.55rem;
             font-variant-numeric: tabular-nums;
         }
         .recommend-card .score-chip strong {
-            color: #0a0a0a;
+            color: #1d4ed8;
             font-weight: 700;
         }
 
         /* Small note */
         .small-note {
-            color: #737373;
+            color: #6b7280;
             font-size: 0.82rem;
             line-height: 1.55;
         }
@@ -396,23 +397,23 @@ def inject_css() -> None:
         /* ── Streamlit metric (STEP 2) ───────────── */
         div[data-testid="stMetric"] {
             background: #ffffff;
-            border: 1px solid #e5e5e5;
+            border: 1px solid #e5e7eb;
             border-radius: 10px;
             padding: 1rem 1.15rem;
         }
         div[data-testid="stMetricLabel"] p {
-            color: #737373;
+            color: #6b7280;
             font-weight: 500;
             font-size: 0.82rem;
         }
         div[data-testid="stMetricValue"] {
-            color: #0a0a0a;
+            color: #111827;
             font-weight: 700;
             letter-spacing: -0.02em;
         }
         div[data-testid="stMetricDelta"] {
             font-size: 0.76rem !important;
-            color: #737373 !important;
+            color: #6b7280 !important;
         }
         div[data-testid="stMetricDelta"] svg { display: none; }
 
@@ -1187,11 +1188,11 @@ def render_top5_ranking_chart(top: pd.Series, contributions: pd.DataFrame) -> No
         for industry in plot_df["산업"]
     ]
     n = len(plot_df)
-    rank_colors = {1: "#b45309", 2: "#737373", 3: "#a16207"}
+    rank_colors = {1: "#d97706", 2: "#94a3b8", 3: "#b45309"}
     colors = []
     for i in range(n):
         rank = n - i
-        colors.append(rank_colors.get(rank, "#d4d4d4"))
+        colors.append(rank_colors.get(rank, "#cbd5e1"))
     labels = [f"{v:.0f}점  ·  {f}" for v, f in zip(plot_df["적합도"], dominant_factors)]
     fig = go.Figure(go.Bar(
         x=plot_df["적합도"],
