@@ -104,11 +104,11 @@ HYPOTHESIS_IMAGES = {
 
 MEDALS = ["1위", "2위", "3위", "4위", "5위"]
 
-CHART_FONT = "Pretendard Variable, Pretendard, Malgun Gothic, sans-serif"
-CHART_PRIMARY = "#1d4ed8"
-CHART_ACCENT = "#6366f1"
-CHART_MUTED = "#94a3b8"
-CHART_INK = "#0f172a"
+CHART_FONT = "Apple SD Gothic Neo, Pretendard, Malgun Gothic, sans-serif"
+CHART_PRIMARY = "#0a0a0a"
+CHART_ACCENT = "#1d4ed8"
+CHART_MUTED = "#a3a3a3"
+CHART_INK = "#0a0a0a"
 
 
 def apply_chart_theme(fig: go.Figure, *, height: int | None = None, show_legend: bool = True) -> go.Figure:
@@ -127,12 +127,12 @@ def apply_chart_theme(fig: go.Figure, *, height: int | None = None, show_legend:
         hoverlabel=dict(font=dict(family=CHART_FONT, size=13), bgcolor="#0f172a", font_color="#ffffff"),
     )
     fig.update_xaxes(
-        showgrid=True, gridcolor="#eef2f7", zeroline=False, linecolor="#cbd5e1",
-        tickfont=dict(size=12, color=CHART_INK), title_font=dict(size=13, color="#475569"),
+        showgrid=True, gridcolor="#f0f0f0", zeroline=False, linecolor="#e5e5e5",
+        tickfont=dict(size=12, color="#525252"), title_font=dict(size=12, color="#737373"),
     )
     fig.update_yaxes(
-        showgrid=True, gridcolor="#eef2f7", zeroline=False, linecolor="#cbd5e1",
-        tickfont=dict(size=12, color=CHART_INK), title_font=dict(size=13, color="#475569"),
+        showgrid=True, gridcolor="#f0f0f0", zeroline=False, linecolor="#e5e5e5",
+        tickfont=dict(size=12, color="#525252"), title_font=dict(size=12, color="#737373"),
     )
     if height is not None:
         fig.update_layout(height=height)
@@ -143,259 +143,343 @@ st.set_page_config(page_title="푸바오 — 산업 입지 분석", layout="wide
 
 
 def inject_css() -> None:
-    """Apply modern dashboard styling."""
+    """Apply refined minimal dashboard styling."""
     st.markdown(
         """
         <style>
+        /* ── Base ─────────────────────────────────── */
         html, body, .stApp {
-            font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+            font-family: "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", "Noto Sans KR", -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: #0a0a0a;
         }
-        .stApp { background: #f6f8fc; }
-        .block-container { padding-top: 1.4rem; padding-bottom: 3rem; max-width: 1480px; }
+        .stApp { background: #fafafa; }
+        .block-container {
+            padding-top: 2rem;
+            padding-bottom: 4rem;
+            max-width: 1400px;
+        }
 
-        /* 헤더 */
+        /* ── Hero ─────────────────────────────────── */
         .hero {
-            background: linear-gradient(135deg, #1d4ed8, #4f46e5 60%, #6366f1);
-            color: #ffffff;
-            border-radius: 12px;
-            padding: 1.4rem 1.6rem 1.5rem;
-            margin-bottom: 1.4rem;
-            box-shadow: 0 10px 30px rgba(29, 78, 216, 0.18);
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .hero .eyebrow {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #737373;
+            font-weight: 600;
+            margin-bottom: 0.65rem;
         }
         .hero h1 {
-            color: #ffffff;
-            font-size: 1.85rem;
-            font-weight: 800;
-            margin: 0 0 0.35rem;
-        }
-        .hero p { color: rgba(255,255,255,0.92); margin: 0; font-size: 0.95rem; }
-        .hero .badges { margin-top: 0.85rem; }
-        .hero .badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.18);
-            border: 1px solid rgba(255,255,255,0.28);
-            color: #ffffff;
-            font-size: 0.76rem;
-            padding: 0.25rem 0.65rem;
-            border-radius: 999px;
-            margin-right: 0.35rem;
-            margin-bottom: 0.3rem;
-        }
-
-        /* 섹션 타이틀 */
-        .section-title {
-            color: #0f172a;
-            font-size: 1.08rem;
+            color: #0a0a0a;
+            font-size: 1.95rem;
             font-weight: 700;
-            margin: 1.2rem 0 0.6rem;
-            border-left: 4px solid #1d4ed8;
-            padding-left: 0.55rem;
+            margin: 0 0 0.55rem;
+            letter-spacing: -0.028em;
+            line-height: 1.18;
         }
-        .section-sub { color: #64748b; font-size: 0.84rem; margin: -0.3rem 0 0.7rem 0.7rem; }
-
-        /* 카드 (탐색 - 4요인 메트릭) */
-        .info-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 0.9rem 1rem;
-            background: #ffffff;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
-            min-height: 118px;
-        }
-        .info-card h3 {
-            font-size: 0.82rem;
-            color: #64748b;
-            margin: 0 0 0.3rem;
-            font-weight: 600;
-        }
-        .info-card .value {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: #0f172a;
+        .hero p {
+            color: #525252;
             margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.55;
+            max-width: 760px;
         }
-        .info-card .sub { font-size: 0.78rem; color: #64748b; margin-top: 0.35rem; }
+        .hero .meta {
+            margin-top: 1.1rem;
+            font-size: 0.78rem;
+            color: #a3a3a3;
+        }
+        .hero .meta span:not(:last-child)::after {
+            content: "·";
+            margin: 0 0.55rem;
+            color: #d4d4d4;
+        }
 
-        /* 추천 카드 (TOP 5) - 메달 스타일 */
-        .rank-card {
-            border: 1px solid #e2e8f0;
-            border-top: 3px solid #1d4ed8;
-            border-radius: 10px;
-            padding: 0.9rem 1rem 0.85rem;
-            background: #ffffff;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
-            min-height: 140px;
-        }
-        .rank-card .medal {
-            display: inline-block;
-            width: 24px; height: 24px;
-            border-radius: 50%;
-            font-size: 0.78rem; font-weight: 800;
-            color: #ffffff;
-            text-align: center;
-            line-height: 24px;
-            margin-right: 0.45rem;
-            vertical-align: middle;
-        }
-        .rank-card .medal.r1 { background: #f59e0b; }
-        .rank-card .medal.r2 { background: #94a3b8; }
-        .rank-card .medal.r3 { background: #b45309; }
-        .rank-card .medal.r4, .rank-card .medal.r5 { background: #94a3b8; }
-        .rank-card .title {
-            font-size: 0.98rem;
+        /* ── Section titles ─────────────────────── */
+        .section-title {
+            color: #0a0a0a;
+            font-size: 1.12rem;
             font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 0.25rem;
+            margin: 2rem 0 0.3rem;
+            letter-spacing: -0.018em;
         }
-        .rank-card .score {
-            font-size: 1.55rem;
-            font-weight: 800;
-            color: #1d4ed8;
-            line-height: 1.1;
+        .section-sub {
+            color: #525252;
+            font-size: 0.86rem;
+            margin: 0 0 1.2rem;
+            line-height: 1.55;
         }
-        .rank-card .score-unit { font-size: 0.85rem; color: #64748b; font-weight: 600; margin-left: 0.2rem; }
-        .rank-card .sub { font-size: 0.78rem; color: #64748b; margin-top: 0.4rem; line-height: 1.5; }
 
-        /* 추천 카드 (탐색 탭 TOP 3) */
-        .recommend-card {
-            border: 1px solid #e2e8f0;
-            border-left: 4px solid #1d4ed8;
+        /* ── Unified card system ─────────────────── */
+        .factor-card, .rank-card, .recommend-card, .info-card {
             background: #ffffff;
-            border-radius: 8px;
-            padding: 0.8rem 0.95rem;
-            margin-bottom: 0.55rem;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
-        }
-        .recommend-card b { color: #0f172a; font-size: 0.97rem; }
-        .recommend-card .score-chip {
-            display: inline-block;
-            background: #eff4ff;
-            color: #1d4ed8;
-            font-size: 0.74rem;
-            font-weight: 700;
-            padding: 0.12rem 0.55rem;
-            border-radius: 999px;
-            margin-left: 0.4rem;
-        }
-        .small-note { color: #64748b; font-size: 0.82rem; line-height: 1.5; }
-
-        /* Streamlit 메트릭 카드 */
-        div[data-testid="stMetric"] {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #e5e5e5;
             border-radius: 10px;
-            padding: 0.85rem 0.95rem;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+            transition: border-color 0.15s ease;
+        }
+        .factor-card:hover, .rank-card:hover, .recommend-card:hover {
+            border-color: #d4d4d4;
         }
 
-        /* 입지요인 카드 (탐색 모드) */
+        /* Factor card (탐색 모드) */
         .factor-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 0.95rem 1.05rem 0.85rem;
-            background: #ffffff;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+            padding: 1.1rem 1.2rem 1rem;
             margin-bottom: 0.75rem;
-            position: relative;
         }
         .factor-card-head {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.45rem;
+            align-items: baseline;
+            margin-bottom: 0.7rem;
         }
         .factor-card-title {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: #0f172a;
-            letter-spacing: -0.01em;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #0a0a0a;
+            letter-spacing: -0.005em;
         }
         .factor-card-rank {
             font-size: 0.74rem;
-            font-weight: 800;
-            color: #1d4ed8;
-            background: #eff4ff;
-            padding: 0.18rem 0.55rem;
-            border-radius: 999px;
-            border: 1px solid #c7d6f7;
+            color: #525252;
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+        .factor-card-rank strong {
+            color: #0a0a0a;
+            font-weight: 700;
         }
         .factor-card-value {
-            font-size: 1.7rem;
-            font-weight: 800;
-            color: #0f172a;
-            line-height: 1.1;
-            letter-spacing: -0.02em;
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: #0a0a0a;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            font-variant-numeric: tabular-nums;
             display: flex;
             align-items: baseline;
             gap: 0.35rem;
+            margin-bottom: 0.25rem;
         }
         .factor-card-value-unit {
             font-size: 0.8rem;
-            font-weight: 600;
-            color: #64748b;
+            font-weight: 500;
+            color: #a3a3a3;
+            letter-spacing: 0;
         }
         .factor-card-sub {
             font-size: 0.78rem;
-            color: #64748b;
-            margin: 0.15rem 0 0.55rem;
-        }
-        .factor-card-extra {
-            font-size: 0.8rem;
-            color: #475569;
-            padding: 0.5rem 0;
-            margin: 0 0 0.55rem;
-            border-top: 1px dashed #e2e8f0;
-            border-bottom: 1px dashed #e2e8f0;
+            color: #525252;
+            margin: 0 0 0.85rem;
+            line-height: 1.5;
         }
         .factor-card-bar {
-            background: #f1f5f9;
-            height: 7px;
+            background: #f0f0f0;
+            height: 4px;
             border-radius: 999px;
             overflow: hidden;
-            margin-bottom: 0.35rem;
-            position: relative;
+            margin-bottom: 0.4rem;
         }
         .factor-card-bar-fill {
-            background: linear-gradient(90deg, #1d4ed8, #6366f1);
+            background: #0a0a0a;
             height: 100%;
             border-radius: 999px;
-            transition: width 0.4s ease;
         }
         .factor-card-bar-foot {
             display: flex;
             justify-content: space-between;
-            font-size: 0.72rem;
-            color: #94a3b8;
-            margin-bottom: 0.55rem;
+            font-size: 0.7rem;
+            color: #a3a3a3;
+            margin-bottom: 0.65rem;
+            font-variant-numeric: tabular-nums;
         }
         .factor-card-tag {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             font-size: 0.76rem;
-            font-weight: 700;
-            padding: 0.2rem 0.65rem;
-            border-radius: 999px;
+            color: #525252;
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+        .factor-card-tag .dot {
+            display: inline-block;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
         }
 
-        /* 상태 칩 (가설 결과) */
-        .status-chip {
-            display: inline-block;
-            padding: 0.18rem 0.65rem;
-            border-radius: 999px;
-            font-size: 0.76rem;
+        /* Rank card (TOP 5) */
+        .rank-card {
+            padding: 1rem 1.15rem 0.95rem;
+            min-height: 124px;
+        }
+        .rank-card .medal {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            font-size: 0.74rem;
             font-weight: 700;
+            color: #ffffff;
+            margin-right: 0.55rem;
+            vertical-align: -3px;
+        }
+        .rank-card .medal.r1 { background: #b45309; }
+        .rank-card .medal.r2 { background: #737373; }
+        .rank-card .medal.r3 { background: #a16207; }
+        .rank-card .medal.r4, .rank-card .medal.r5 { background: #a3a3a3; }
+        .rank-card .title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #0a0a0a;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.005em;
+        }
+        .rank-card .score {
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: #0a0a0a;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            font-variant-numeric: tabular-nums;
+        }
+        .rank-card .score-unit {
+            font-size: 0.8rem;
+            color: #a3a3a3;
+            font-weight: 500;
+            margin-left: 0.15rem;
+        }
+        .rank-card .sub {
+            font-size: 0.76rem;
+            color: #525252;
+            margin-top: 0.5rem;
+            line-height: 1.5;
+        }
+
+        /* Recommend card (탐색 TOP 3) */
+        .recommend-card {
+            padding: 0.95rem 1.1rem;
             margin-bottom: 0.5rem;
         }
-        .status-support { background: #ecfdf5; color: #047857; }
-        .status-partial { background: #fffbeb; color: #b45309; }
-        .status-limited { background: #fef2f2; color: #b91c1c; }
-
-        /* 사이드바 타이틀 */
-        .sidebar-title {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: #0f172a;
-            margin: 0.25rem 0 0.4rem;
+        .recommend-card b {
+            color: #0a0a0a;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: -0.005em;
         }
+        .recommend-card .score-chip {
+            display: inline-block;
+            color: #525252;
+            font-size: 0.76rem;
+            font-weight: 500;
+            margin-left: 0.55rem;
+            font-variant-numeric: tabular-nums;
+        }
+        .recommend-card .score-chip strong {
+            color: #0a0a0a;
+            font-weight: 700;
+        }
+
+        /* Small note */
+        .small-note {
+            color: #737373;
+            font-size: 0.82rem;
+            line-height: 1.55;
+        }
+
+        /* ── Streamlit metric (STEP 2) ───────────── */
+        div[data-testid="stMetric"] {
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 1rem 1.15rem;
+        }
+        div[data-testid="stMetricLabel"] p {
+            color: #737373;
+            font-weight: 500;
+            font-size: 0.82rem;
+        }
+        div[data-testid="stMetricValue"] {
+            color: #0a0a0a;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        div[data-testid="stMetricDelta"] {
+            font-size: 0.76rem !important;
+            color: #737373 !important;
+        }
+        div[data-testid="stMetricDelta"] svg { display: none; }
+
+        /* ── Status chip (가설) — dot pattern ────── */
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.2rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 500;
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            color: #525252;
+            margin-bottom: 0.6rem;
+        }
+        .status-chip::before {
+            content: "";
+            display: inline-block;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            margin-right: 0.45rem;
+        }
+        .status-support::before { background: #16a34a; }
+        .status-partial::before { background: #d97706; }
+        .status-limited::before { background: #dc2626; }
+
+        /* ── Sidebar ─────────────────────────────── */
+        section[data-testid="stSidebar"] {
+            background: #ffffff;
+            border-right: 1px solid #e5e5e5;
+        }
+        section[data-testid="stSidebar"] .stRadio > label p,
+        section[data-testid="stSidebar"] .stSelectbox > label p {
+            font-weight: 600;
+            color: #0a0a0a;
+            font-size: 0.82rem;
+        }
+        .sidebar-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #737373;
+            margin: 0.5rem 0 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        /* ── Expander ────────────────────────────── */
+        div[data-testid="stExpander"] {
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            background: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+        div[data-testid="stExpander"] summary {
+            font-weight: 600;
+            color: #0a0a0a;
+            font-size: 0.93rem;
+        }
+
+        /* ── Alert (st.info, st.success) ─────────── */
+        div[data-testid="stAlert"] {
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+        }
+        div[data-testid="stAlert"] p { color: #0a0a0a; }
         </style>
         """,
         unsafe_allow_html=True,
@@ -597,13 +681,14 @@ def render_header() -> None:
     st.markdown(
         """
         <div class="hero">
-          <h1>푸바오 · 한국 산업별 입지 결정 요인 분석</h1>
-          <p>17개 시도 × 26개 산업그룹 × 8개 가설 결과를 탐색하고, 신규 산업단지 입지를 시뮬레이션합니다.</p>
-          <div class="badges">
-            <span class="badge">팀 푸바오</span>
-            <span class="badge">아주대 융합시스템공학과</span>
-            <span class="badge">최종 발표 2026-06-22</span>
-            <span class="badge">N = 17 시도 · 5년 패널</span>
+          <div class="eyebrow">한국 산업 입지 분석 대시보드</div>
+          <h1>푸바오 · 산업별 입지 결정 요인 탐색기</h1>
+          <p>17개 시도 × 26개 산업그룹 × 8개 가설을 시각적으로 탐색하고, 신규 산업단지의 입지 조건을 시뮬레이션합니다.</p>
+          <div class="meta">
+            <span>팀 푸바오</span>
+            <span>아주대 융합시스템공학과</span>
+            <span>최종 발표 2026.06.22</span>
+            <span>N = 17 시도 · 5년 패널</span>
           </div>
         </div>
         """,
@@ -658,7 +743,7 @@ def make_industry_map(selected_sido: str, selected_industry: str, selected_year:
 
 
 def render_factor_cards(selected_sido: str) -> None:
-    """Render four rich location-factor cards for a selected province."""
+    """Render four refined location-factor cards for a selected province."""
     df = load_integrated_df()
     row = df[df["시도"] == selected_sido].iloc[0]
     cards = [
@@ -666,32 +751,28 @@ def render_factor_cards(selected_sido: str) -> None:
             "title": "항만 접근",
             "value": f"{row['하역능력_합계']:,.0f}",
             "unit": "톤",
-            "sub": f"log값 {row['log_하역능력_합계']:.2f}  ·  무역항 {row['무역항수']:.0f}개",
-            "extra": "하역능력 합계 (선박 하역 처리량)",
+            "sub": f"log값 {row['log_하역능력_합계']:.2f} · 무역항 {row['무역항수']:.0f}개",
             "rank_col": "log_하역능력_합계",
         },
         {
             "title": "도로 인프라",
             "value": f"{row['IC밀도_개당1000km2']:.1f}",
-            "unit": "개/천㎢",
+            "unit": "개 / 1,000㎢",
             "sub": f"고속도로 IC 총 {row['IC수']:.0f}개",
-            "extra": "면적 1,000㎢ 당 IC 수 (접근성 지표)",
             "rank_col": "IC밀도_개당1000km2",
         },
         {
             "title": "산업용 전력",
             "value": f"{row['log_산업용전력_2024']:.2f}",
             "unit": "log(GWh)",
-            "sub": "2024년 산업용 전력 사용량 (log 변환)",
-            "extra": "값이 높을수록 전력 인프라 풍부",
+            "sub": "2024년 산업용 전력 사용량",
             "rank_col": "log_산업용전력_2024",
         },
         {
             "title": "평균임금",
             "value": f"{row['평균임금_2024_만원']:.0f}",
-            "unit": "만원/월",
+            "unit": "만원 / 월",
             "sub": f"백만원 환산 {row['평균임금_2024_백만원']:.2f}",
-            "extra": "2024년 월평균 임금 (자본·노동집약 분기 기준)",
             "rank_col": "평균임금_2024_백만원",
         },
     ]
@@ -707,15 +788,15 @@ def render_factor_cards(selected_sido: str) -> None:
         rank_pct = (17 - rank + 1) / 17 * 100
 
         if z >= 1.0:
-            tag, tag_bg, tag_fg = "매우 높음", "#fee2e2", "#b91c1c"
+            tag, dot = "매우 높음", "#dc2626"
         elif z >= 0.3:
-            tag, tag_bg, tag_fg = "약간 높음", "#fef3c7", "#b45309"
+            tag, dot = "약간 높음", "#d97706"
         elif z >= -0.3:
-            tag, tag_bg, tag_fg = "평균 수준", "#f1f5f9", "#475569"
+            tag, dot = "평균 수준", "#a3a3a3"
         elif z >= -1.0:
-            tag, tag_bg, tag_fg = "약간 낮음", "#dbeafe", "#1d4ed8"
+            tag, dot = "약간 낮음", "#2563eb"
         else:
-            tag, tag_bg, tag_fg = "매우 낮음", "#dbeafe", "#1e3a8a"
+            tag, dot = "매우 낮음", "#1e3a8a"
 
         with cols[idx % 2]:
             st.markdown(
@@ -723,17 +804,17 @@ def render_factor_cards(selected_sido: str) -> None:
                 <div class="factor-card">
                   <div class="factor-card-head">
                     <div class="factor-card-title">{card['title']}</div>
-                    <div class="factor-card-rank">17개 시도 중 {rank}위</div>
+                    <div class="factor-card-rank"><strong>{rank}</strong> / 17위</div>
                   </div>
                   <div class="factor-card-value">{card['value']}<span class="factor-card-value-unit">{card['unit']}</span></div>
                   <div class="factor-card-sub">{card['sub']}</div>
-                  <div class="factor-card-extra">{card['extra']}</div>
                   <div class="factor-card-bar"><div class="factor-card-bar-fill" style="width:{rank_pct:.0f}%"></div></div>
                   <div class="factor-card-bar-foot">
-                    <span>17위 (최저)</span>
-                    <span>1위 (최고)</span>
+                    <span>17위</span>
+                    <span>1위</span>
                   </div>
-                  <div class="factor-card-tag" style="background:{tag_bg};color:{tag_fg};">
+                  <div class="factor-card-tag">
+                    <span class="dot" style="background:{dot}"></span>
                     평균 대비 {z:+.2f}σ · {tag}
                   </div>
                 </div>
@@ -748,13 +829,14 @@ def render_matching_recommendation(selected_sido: str) -> None:
     row = df[df["시도"] == selected_sido].iloc[0]
     raw = {factor: float(row[col]) for factor, col in FACTOR_COLUMNS.items()}
     top, contributions, _ = recommend_industries(raw, top_n=3)
-    st.markdown('<div class="section-title">이 시도에 어울리는 산업 TOP 3</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">어울리는 산업 TOP 3</div>', unsafe_allow_html=True)
+    st.markdown('<p class="section-sub">이 시도의 입지 조건과 가장 잘 맞는 산업입니다.</p>', unsafe_allow_html=True)
     for idx, (industry, score) in enumerate(top.items()):
         dominant = contributions.loc[industry].sort_values(ascending=False).index[0]
         st.markdown(
             f"""
             <div class="recommend-card">
-              <b>{idx + 1}. {industry}</b><span class="score-chip">적합도 {score:.0f}점</span><br>
+              <b>{idx + 1}. {industry}</b><span class="score-chip">적합도 <strong>{score:.0f}</strong> / 100</span><br>
               <span class="small-note">주요 기여: <b>{dominant}</b> · {industry_comment(industry, contributions.loc[industry])}</span>
             </div>
             """,
@@ -973,7 +1055,7 @@ def render_zscore_chart(x_user_z: pd.Series) -> None:
     z_df = x_user_z.reset_index()
     z_df.columns = ["요인", "z-score"]
     z_df = z_df.iloc[::-1].reset_index(drop=True)
-    bar_colors = ["#dc2626" if v >= 0 else "#2563eb" for v in z_df["z-score"]]
+    bar_colors = ["#b91c1c" if v >= 0 else "#1e40af" for v in z_df["z-score"]]
     text_labels = []
     for v in z_df["z-score"]:
         if v >= 1.0:
@@ -1033,10 +1115,10 @@ def render_factor_distribution(user_raw: dict[str, float]) -> None:
             ))
             fig.add_trace(go.Scatter(
                 y=[user_val], x=["17개 시도"], mode="markers+text",
-                marker=dict(size=22, color="#dc2626", symbol="diamond", line=dict(width=2.5, color="#ffffff")),
+                marker=dict(size=20, color="#b91c1c", symbol="diamond", line=dict(width=2.5, color="#ffffff")),
                 text=[f"입력 {user_val:.2f}"],
                 textposition="middle right",
-                textfont=dict(size=13, color="#dc2626", family=CHART_FONT),
+                textfont=dict(size=12, color="#b91c1c", family=CHART_FONT),
                 name="입력값",
                 hovertemplate=f"<b>입력값</b><br>{user_val:.2f}<extra></extra>",
                 showlegend=False,
@@ -1105,11 +1187,11 @@ def render_top5_ranking_chart(top: pd.Series, contributions: pd.DataFrame) -> No
         for industry in plot_df["산업"]
     ]
     n = len(plot_df)
-    rank_colors = {1: "#f59e0b", 2: "#94a3b8", 3: "#b45309"}
+    rank_colors = {1: "#b45309", 2: "#737373", 3: "#a16207"}
     colors = []
     for i in range(n):
         rank = n - i
-        colors.append(rank_colors.get(rank, "#cbd5e1"))
+        colors.append(rank_colors.get(rank, "#d4d4d4"))
     labels = [f"{v:.0f}점  ·  {f}" for v, f in zip(plot_df["적합도"], dominant_factors)]
     fig = go.Figure(go.Bar(
         x=plot_df["적합도"],
@@ -1231,10 +1313,7 @@ def render_simulator_mode() -> None:
 
 def render_sidebar() -> tuple[str, str, str, int]:
     """Render sidebar controls and return selected values."""
-    st.sidebar.markdown('<div class="sidebar-title">대시보드 설정</div>', unsafe_allow_html=True)
-    st.sidebar.caption("분석 모드를 선택하고 필터를 조정하세요.")
-
-    st.sidebar.markdown("##### 모드")
+    st.sidebar.markdown('<div class="sidebar-title">Mode</div>', unsafe_allow_html=True)
     mode = st.sidebar.radio(
         "모드",
         ["탐색", "가설 결과", "신규 산단 시뮬레이터"],
@@ -1242,16 +1321,15 @@ def render_sidebar() -> tuple[str, str, str, int]:
         label_visibility="collapsed",
     )
 
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("##### 필터")
+    st.sidebar.markdown('<div class="sidebar-title" style="margin-top:1.3rem">Filter</div>', unsafe_allow_html=True)
     selected_sido = st.sidebar.selectbox("시도", SIDO_ORDER, index=SIDO_ORDER.index("경기"))
     industries = get_industries()
     default_idx = industries.index("반도체·전자") if "반도체·전자" in industries else 0
     selected_industry = st.sidebar.selectbox("산업", industries, index=default_idx)
     selected_year = st.sidebar.selectbox("연도", [2024, 2023, 2022, 2021, 2020], index=0)
 
-    st.sidebar.markdown("---")
-    st.sidebar.caption("**팀 푸바오** · 아주대 융합시스템공학과")
+    st.sidebar.markdown('<div class="sidebar-title" style="margin-top:1.5rem">Team</div>', unsafe_allow_html=True)
+    st.sidebar.caption("팀 푸바오 · 아주대 융합시스템공학과")
     st.sidebar.caption("이동혁 · 서찬 · 박현민 · 정현문")
     return mode, selected_sido, selected_industry, int(selected_year)
 
