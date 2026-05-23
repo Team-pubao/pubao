@@ -7,7 +7,6 @@ import math
 from pathlib import Path
 
 import folium
-import geopandas as gpd
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -395,12 +394,21 @@ def load_final_summary() -> pd.DataFrame:
 
 
 @st.cache_data(show_spinner=False)
-def load_geojson() -> gpd.GeoDataFrame:
-    """Load province GeoJSON as a GeoDataFrame."""
-    gdf = gpd.read_file(DATA_DIR / "지도_시도.json")
-    name_col = "시도" if "시도" in gdf.columns else "name"
-    gdf["시도"] = gdf[name_col].map(short_sido)
-    return sorted_by_sido(gdf[gdf["시도"].isin(SIDO_ORDER)].copy())
+def load_geojson_dict() -> dict:
+    """Load province GeoJSON as a plain dict with normalized 시도 names."""
+    with open(DATA_DIR / "지도_시도.json", encoding="utf-8") as f:
+        geo = json.load(f)
+    valid: list[dict] = []
+    for feature in geo.get("features", []):
+        props = feature.get("properties", {}) or {}
+        raw_name = props.get("시도") or props.get("name") or props.get("SIDO_NM") or props.get("NAME")
+        short = short_sido(raw_name) if isinstance(raw_name, str) else None
+        if isinstance(short, str) and short in SIDO_ORDER:
+            props["시도"] = short
+            feature["properties"] = props
+            valid.append(feature)
+    valid.sort(key=lambda f: SIDO_ORDER.index(f["properties"]["시도"]))
+    return {"type": geo.get("type", "FeatureCollection"), "features": valid}
 
 
 @st.cache_data(show_spinner=False)
@@ -518,10 +526,19 @@ def render_header() -> None:
 def make_industry_map(selected_sido: str, selected_industry: str, selected_year: int) -> folium.Map:
     """Build a choropleth map for selected industry share."""
     df = load_year_industry_df(selected_year)
-    gdf = load_geojson().merge(df[["시도", selected_industry, f"비중_{selected_industry}"]], on="시도", how="left")
     share_col = f"비중_{selected_industry}"
-    value_min = float(gdf[share_col].min())
-    value_max = float(gdf[share_col].max())
+    share_map = dict(zip(df["시도"], df[share_col]))
+    count_map = dict(zip(df["시도"], df[selected_industry]))
+
+    geo = json.loads(json.dumps(load_geojson_dict()))
+    for feature in geo["features"]:
+        sido = feature["properties"]["시도"]
+        feature["properties"][share_col] = float(share_map.get(sido, 0.0))
+        feature["properties"][selected_industry] = float(count_map.get(sido, 0.0))
+
+    shares = [f["properties"][share_col] for f in geo["features"]]
+    value_min = float(min(shares))
+    value_max = float(max(shares))
     cmap = linear.YlGnBu_09.scale(value_min, value_max)
     fmap = folium.Map(location=[36.4, 127.8], zoom_start=7, tiles="OpenStreetMap", control_scale=True)
 
@@ -537,7 +554,7 @@ def make_industry_map(selected_sido: str, selected_industry: str, selected_year:
         }
 
     folium.GeoJson(
-        json.loads(gdf.to_json()),
+        geo,
         name=f"{selected_year}년 {selected_industry} 비중",
         style_function=style,
         tooltip=folium.GeoJsonTooltip(
