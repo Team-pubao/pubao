@@ -288,6 +288,94 @@ def inject_css() -> None:
             box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
         }
 
+        /* 입지요인 카드 (탐색 모드) */
+        .factor-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0.95rem 1.05rem 0.85rem;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+            margin-bottom: 0.75rem;
+            position: relative;
+        }
+        .factor-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.45rem;
+        }
+        .factor-card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.01em;
+        }
+        .factor-card-rank {
+            font-size: 0.74rem;
+            font-weight: 800;
+            color: #1d4ed8;
+            background: #eff4ff;
+            padding: 0.18rem 0.55rem;
+            border-radius: 999px;
+            border: 1px solid #c7d6f7;
+        }
+        .factor-card-value {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: baseline;
+            gap: 0.35rem;
+        }
+        .factor-card-value-unit {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+        .factor-card-sub {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin: 0.15rem 0 0.55rem;
+        }
+        .factor-card-extra {
+            font-size: 0.8rem;
+            color: #475569;
+            padding: 0.5rem 0;
+            margin: 0 0 0.55rem;
+            border-top: 1px dashed #e2e8f0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .factor-card-bar {
+            background: #f1f5f9;
+            height: 7px;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 0.35rem;
+            position: relative;
+        }
+        .factor-card-bar-fill {
+            background: linear-gradient(90deg, #1d4ed8, #6366f1);
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.4s ease;
+        }
+        .factor-card-bar-foot {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            color: #94a3b8;
+            margin-bottom: 0.55rem;
+        }
+        .factor-card-tag {
+            display: inline-block;
+            font-size: 0.76rem;
+            font-weight: 700;
+            padding: 0.2rem 0.65rem;
+            border-radius: 999px;
+        }
+
         /* 상태 칩 (가설 결과) */
         .status-chip {
             display: inline-block;
@@ -570,20 +658,88 @@ def make_industry_map(selected_sido: str, selected_industry: str, selected_year:
 
 
 def render_factor_cards(selected_sido: str) -> None:
-    """Render four location-factor cards for a selected province."""
+    """Render four rich location-factor cards for a selected province."""
     df = load_integrated_df()
     row = df[df["시도"] == selected_sido].iloc[0]
-    card_specs = [
-        ("항만 접근", "하역능력_합계", f"{row['하역능력_합계']:,.0f}", False, f"무역항 {row['무역항수']:.0f}개"),
-        ("도로 인프라", "IC밀도_개당1000km2", f"{row['IC밀도_개당1000km2']:.1f}", False, f"IC {row['IC수']:.0f}개"),
-        ("산업용 전력", "log_산업용전력_2024", f"{row['log_산업용전력_2024']:.2f}", False, "log 산업용전력"),
-        ("평균임금", "평균임금_2024", f"{row['평균임금_2024_만원']:.0f}만원", False, "월 평균"),
+    cards = [
+        {
+            "title": "항만 접근",
+            "value": f"{row['하역능력_합계']:,.0f}",
+            "unit": "톤",
+            "sub": f"log값 {row['log_하역능력_합계']:.2f}  ·  무역항 {row['무역항수']:.0f}개",
+            "extra": "하역능력 합계 (선박 하역 처리량)",
+            "rank_col": "log_하역능력_합계",
+        },
+        {
+            "title": "도로 인프라",
+            "value": f"{row['IC밀도_개당1000km2']:.1f}",
+            "unit": "개/천㎢",
+            "sub": f"고속도로 IC 총 {row['IC수']:.0f}개",
+            "extra": "면적 1,000㎢ 당 IC 수 (접근성 지표)",
+            "rank_col": "IC밀도_개당1000km2",
+        },
+        {
+            "title": "산업용 전력",
+            "value": f"{row['log_산업용전력_2024']:.2f}",
+            "unit": "log(GWh)",
+            "sub": "2024년 산업용 전력 사용량 (log 변환)",
+            "extra": "값이 높을수록 전력 인프라 풍부",
+            "rank_col": "log_산업용전력_2024",
+        },
+        {
+            "title": "평균임금",
+            "value": f"{row['평균임금_2024_만원']:.0f}",
+            "unit": "만원/월",
+            "sub": f"백만원 환산 {row['평균임금_2024_백만원']:.2f}",
+            "extra": "2024년 월평균 임금 (자본·노동집약 분기 기준)",
+            "rank_col": "평균임금_2024_백만원",
+        },
     ]
+
     cols = st.columns(2)
-    for idx, (title, col, value, ascending, sub) in enumerate(card_specs):
-        rank = rank_of_value(df, col, selected_sido, ascending=ascending)
+    for idx, card in enumerate(cards):
+        col_values = df[card["rank_col"]]
+        mean = float(col_values.mean())
+        std = float(col_values.std(ddof=0))
+        raw_value = float(row[card["rank_col"]])
+        z = (raw_value - mean) / std if std > 0 else 0.0
+        rank = rank_of_value(df, card["rank_col"], selected_sido, ascending=False)
+        rank_pct = (17 - rank + 1) / 17 * 100
+
+        if z >= 1.0:
+            tag, tag_bg, tag_fg = "매우 높음", "#fee2e2", "#b91c1c"
+        elif z >= 0.3:
+            tag, tag_bg, tag_fg = "약간 높음", "#fef3c7", "#b45309"
+        elif z >= -0.3:
+            tag, tag_bg, tag_fg = "평균 수준", "#f1f5f9", "#475569"
+        elif z >= -1.0:
+            tag, tag_bg, tag_fg = "약간 낮음", "#dbeafe", "#1d4ed8"
+        else:
+            tag, tag_bg, tag_fg = "매우 낮음", "#dbeafe", "#1e3a8a"
+
         with cols[idx % 2]:
-            st.metric(title, value, delta=f"17개 시도 중 {rank}위 · {sub}", delta_color="off")
+            st.markdown(
+                f"""
+                <div class="factor-card">
+                  <div class="factor-card-head">
+                    <div class="factor-card-title">{card['title']}</div>
+                    <div class="factor-card-rank">17개 시도 중 {rank}위</div>
+                  </div>
+                  <div class="factor-card-value">{card['value']}<span class="factor-card-value-unit">{card['unit']}</span></div>
+                  <div class="factor-card-sub">{card['sub']}</div>
+                  <div class="factor-card-extra">{card['extra']}</div>
+                  <div class="factor-card-bar"><div class="factor-card-bar-fill" style="width:{rank_pct:.0f}%"></div></div>
+                  <div class="factor-card-bar-foot">
+                    <span>17위 (최저)</span>
+                    <span>1위 (최고)</span>
+                  </div>
+                  <div class="factor-card-tag" style="background:{tag_bg};color:{tag_fg};">
+                    평균 대비 {z:+.2f}σ · {tag}
+                  </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 
 def render_matching_recommendation(selected_sido: str) -> None:
