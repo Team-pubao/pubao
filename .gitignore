@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Streamlit
+.streamlit/secrets.toml
+streamlit.out.log
+streamlit.err.log
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+.pytest_cache/
+.ruff_cache/
+*.swp
+
+# 런타임 미사용 (분석 결과물 / 원본 패키지 / 개발 자료)
+results/maps/
+results/figures/cache/
+final_report/
+src/
+prompts/
+푸바오_개발프롬프트/
+푸바오_데이터패키지/
+
+# 임시 파일
+*.tmp
+*.bak
