@@ -6,10 +6,16 @@
 
 ```powershell
 uv venv --python 3.11
-uv pip install -r requirements.txt
+uv pip install -r requirements-analysis.txt
 ```
 
 시스템 Python이 없다면 `uv run --python 3.11 python src/00_validate_data.py`처럼 실행해도 됩니다.
+
+대시보드만 실행할 때는 경량 의존성 파일을 사용합니다.
+
+```powershell
+uv pip install -r requirements.txt
+```
 
 ## 주요 실행 순서
 
@@ -24,6 +30,7 @@ uv run --python 3.11 python src/h6_heterogeneity.py
 uv run --python 3.11 python src/h7_panel.py
 uv run --python 3.11 python src/h8_groups.py
 uv run --python 3.11 python src/final_report.py
+uv run --python 3.11 python build_v2_outputs.py
 ```
 
 ## 산출물
@@ -32,6 +39,8 @@ uv run --python 3.11 python src/final_report.py
 - `results/figures/`: 발표용 PNG 그림
 - `results/maps/`: Folium HTML 지도
 - `final_report/`: 최종 통합표, 발표 핵심 그림, 발표 노트
+- `results/tables/pubao_v2_analysis.xlsx`: 새 H1~H8 통합 결과
+- `results/figures/pubao_v2_*.png`: 새 가설 흐름의 발표용 정적 그림
 
 ## Streamlit 대시보드
 
@@ -48,5 +57,8 @@ uv 가상환경을 직접 사용할 때는 다음처럼 실행해도 됩니다.
 ```
 
 접속 주소는 `http://localhost:8501` 입니다. 첫 실행은 데이터와 지도를 캐싱하느라 몇 초 걸릴 수 있습니다.
+
+회귀는 시도 17개 자료만 사용합니다. `data/시군구_4요인_통합.csv`와
+`data/시군구_경계_simplified.geojson`은 지도·지역 맥락 시각화에만 사용합니다.
 
 모든 분석 결과는 인과 효과가 아니라 시도 단위 횡단면 및 패널 자료에서 관찰되는 연관성으로 해석합니다.
