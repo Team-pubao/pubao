@@ -1393,7 +1393,7 @@ def render_distribution_section() -> None:
 
 
 def render_explore_mode(selected_sido: str, selected_target: str) -> None:
-    """Render a compact one-screen exploration view — map, factor summary, top picks."""
+    """Render a compact exploration view — map and factor summary, with a time-series below."""
     left, right = st.columns([3, 2])
     with left:
         st.markdown('<div class="section-title">시도별 산업 비중 지도</div>', unsafe_allow_html=True)
@@ -1406,7 +1406,13 @@ def render_explore_mode(selected_sido: str, selected_target: str) -> None:
         st.markdown('<div class="section-title">입지요인 요약</div>', unsafe_allow_html=True)
         st.markdown(f'<p class="section-sub">{selected_sido} · 항만 · 도로 · 전력 · 임금</p>', unsafe_allow_html=True)
         render_factor_cards(selected_sido)
-        render_matching_recommendation(selected_sido)
+
+    st.markdown('<div class="section-title">2020~2024 시계열 변화</div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<p class="section-sub">{selected_sido} · {selected_target} vs 17개 시도 평균</p>',
+        unsafe_allow_html=True,
+    )
+    render_time_series(selected_sido, selected_target, "26산업")
 
 
 def support_status(conclusion: str) -> tuple[str, str]:
