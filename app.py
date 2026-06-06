@@ -1908,10 +1908,7 @@ def render_data_sources() -> None:
             width="stretch",
             hide_index=True,
         )
-    st.caption(
-        "강건성 참고: 5년 패널 고정효과(FE) 보조검증은 results/tables/h7_panel.xlsx에 포함되며, "
-        "항만·IC는 시점불변이라 시도 FE에서 제외됩니다. 모든 결과는 인과가 아니라 연관성·패턴으로 해석합니다."
-    )
+    st.caption("모든 결과는 시도 단위 횡단면에서 관찰된 연관성·패턴이며 인과 효과로 해석하지 않습니다.")
 
 
 def render_hypothesis_mode() -> None:

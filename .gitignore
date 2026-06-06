@@ -25,15 +25,10 @@ desktop.ini
 .ruff_cache/
 *.swp
 
-# 런타임 미사용 (분석 결과물 / 원본 패키지 / 개발 자료)
-results/maps/
+# 생성 캐시
 results/figures/cache/
-final_report/
-src/
-prompts/
-푸바오_개발프롬프트/
-푸바오_데이터패키지/
 
 # 임시 파일
 *.tmp
 *.bak
+~$*

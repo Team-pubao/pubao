@@ -1,5 +1,4 @@
-# Streamlit Cloud 배포용 — app.py 런타임에 필요한 패키지만
-# 분석 스크립트(src/) 전체 의존성은 requirements-analysis.txt 참고
+# Streamlit 앱과 V2 정적 산출물 생성에 필요한 패키지
 
 streamlit>=1.31
 streamlit-folium>=0.18
