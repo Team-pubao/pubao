@@ -191,32 +191,31 @@ def inject_css() -> None:
         }
         .stApp { background: #f9fafb; }
         .block-container {
-            padding-top: 2rem;
-            padding-bottom: 4rem;
+            padding-top: 1rem;
+            padding-bottom: 1.5rem;
             max-width: 1400px;
         }
 
         /* ── Hero ─────────────────────────────────── */
         .hero {
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
+            margin-bottom: 0.85rem;
+            padding-bottom: 0.7rem;
             border-bottom: 1px solid #e5e7eb;
         }
         .hero .eyebrow {
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 0.14em;
+            font-size: 0.7rem;
+            letter-spacing: 0.06em;
             color: #1d4ed8;
             font-weight: 700;
-            margin-bottom: 0.65rem;
+            margin-bottom: 0.25rem;
         }
         .hero h1 {
             color: #111827;
-            font-size: 1.9rem;
+            font-size: 1.3rem;
             font-weight: 700;
-            margin: 0 0 0.55rem;
-            letter-spacing: -0.025em;
-            line-height: 1.2;
+            margin: 0 0 0.2rem;
+            letter-spacing: -0.02em;
+            line-height: 1.25;
         }
         .hero p {
             color: #4b5563;
@@ -226,8 +225,8 @@ def inject_css() -> None:
             max-width: 760px;
         }
         .hero .meta {
-            margin-top: 1.1rem;
-            font-size: 0.78rem;
+            margin-top: 0.4rem;
+            font-size: 0.75rem;
             color: #9ca3af;
         }
         .hero .meta span:not(:last-child)::after {
@@ -239,16 +238,16 @@ def inject_css() -> None:
         /* ── Section titles ─────────────────────── */
         .section-title {
             color: #111827;
-            font-size: 1.12rem;
+            font-size: 1.0rem;
             font-weight: 700;
-            margin: 2rem 0 0.3rem;
+            margin: 0.8rem 0 0.15rem;
             letter-spacing: -0.018em;
         }
         .section-sub {
             color: #6b7280;
-            font-size: 0.86rem;
-            margin: 0 0 1.2rem;
-            line-height: 1.55;
+            font-size: 0.8rem;
+            margin: 0 0 0.45rem;
+            line-height: 1.4;
         }
 
         /* ── Unified card system ─────────────────── */
@@ -265,14 +264,14 @@ def inject_css() -> None:
 
         /* Factor card (탐색 모드) */
         .factor-card {
-            padding: 1.1rem 1.2rem 1rem;
-            margin-bottom: 0.75rem;
+            padding: 0.65rem 0.9rem 0.6rem;
+            margin-bottom: 0.5rem;
         }
         .factor-card-head {
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            margin-bottom: 0.7rem;
+            margin-bottom: 0.4rem;
         }
         .factor-card-title {
             font-size: 0.92rem;
@@ -291,7 +290,7 @@ def inject_css() -> None:
             font-weight: 700;
         }
         .factor-card-value {
-            font-size: 1.85rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: #111827;
             line-height: 1.05;
@@ -300,7 +299,7 @@ def inject_css() -> None:
             display: flex;
             align-items: baseline;
             gap: 0.35rem;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.15rem;
         }
         .factor-card-value-unit {
             font-size: 0.8rem;
@@ -309,10 +308,10 @@ def inject_css() -> None:
             letter-spacing: 0;
         }
         .factor-card-sub {
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             color: #6b7280;
-            margin: 0 0 0.9rem;
-            line-height: 1.5;
+            margin: 0 0 0.5rem;
+            line-height: 1.4;
         }
         .factor-card-bar {
             background: #eef2f7;
@@ -331,7 +330,7 @@ def inject_css() -> None:
             justify-content: space-between;
             font-size: 0.7rem;
             color: #9ca3af;
-            margin-bottom: 0.7rem;
+            margin-bottom: 0.4rem;
             font-variant-numeric: tabular-nums;
         }
         .factor-card-tag {
@@ -1004,7 +1003,6 @@ def render_header() -> None:
         <div class="hero">
           <div class="eyebrow">한국 산업 입지 분석 대시보드</div>
           <h1>푸바오 · 산업별 입지 결정 요인 탐색기</h1>
-          <p>17개 시도 × 26개 산업그룹 × 8개 가설을 시각적으로 탐색하고, 신규 산업단지의 입지 조건을 시뮬레이션합니다.</p>
           <div class="meta">
             <span>팀 푸바오</span>
             <span>아주대 융합시스템공학과</span>
@@ -1282,8 +1280,8 @@ def render_time_series(selected_sido: str, selected_target: str, target_level: s
             trace.text = [f"{int(y):,}" for y in trace.y]
             trace.textposition = "top center"
             trace.textfont = dict(size=12, color=CHART_INK, family=CHART_FONT)
-    apply_chart_theme(fig, height=420)
-    fig.update_layout(legend_title_text="", hovermode="x unified")
+    apply_chart_theme(fig, height=250)
+    fig.update_layout(legend_title_text="", hovermode="x unified", margin=dict(l=16, r=16, t=38, b=8))
     st.plotly_chart(fig, width="stretch")
 
 
@@ -1401,7 +1399,7 @@ def render_explore_mode(selected_sido: str, selected_target: str) -> None:
             f'<p class="section-sub">2024년 고정 · {selected_target} 사업체 비중 · 진할수록 집중도 높음</p>',
             unsafe_allow_html=True,
         )
-        st_folium(make_industry_map(selected_sido, selected_target, "26산업"), height=540, width=900, returned_objects=[])
+        st_folium(make_industry_map(selected_sido, selected_target, "26산업"), height=370, width=780, returned_objects=[])
     with right:
         st.markdown('<div class="section-title">입지요인 요약</div>', unsafe_allow_html=True)
         st.markdown(f'<p class="section-sub">{selected_sido} · 항만 · 도로 · 전력 · 임금</p>', unsafe_allow_html=True)
