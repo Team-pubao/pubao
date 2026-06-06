@@ -542,6 +542,45 @@ def inject_css() -> None:
             font-size: 0.82rem;
             line-height: 1.55;
         }
+
+        /* ── Hypothesis selector cards (st.button) ── */
+        div[data-testid="stButton"] > button {
+            text-align: left;
+            white-space: normal;
+            height: 100%;
+            min-height: 104px;
+            padding: 0.7rem 0.9rem;
+            border-radius: 12px;
+            line-height: 1.45;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #111827;
+            box-shadow: none;
+            transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+        }
+        div[data-testid="stButton"] > button p {
+            text-align: left;
+            white-space: normal;
+            font-weight: 600;
+        }
+        div[data-testid="stButton"] > button[kind="secondary"] {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+        }
+        div[data-testid="stButton"] > button[kind="secondary"]:hover {
+            border-color: #c7d2fe;
+            box-shadow: 0 4px 12px rgba(99,102,241,.10);
+            color: #111827;
+        }
+        div[data-testid="stButton"] > button[kind="primary"],
+        div[data-testid="stButton"] > button[kind="primary"]:hover,
+        div[data-testid="stButton"] > button[kind="primary"]:active,
+        div[data-testid="stButton"] > button[kind="primary"]:focus {
+            background: #eff6ff;
+            border: 2px solid #1d4ed8;
+            color: #0f172a;
+            box-shadow: 0 4px 14px rgba(29,78,216,.18);
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -1281,7 +1320,14 @@ def render_time_series(selected_sido: str, selected_target: str, target_level: s
             trace.textposition = "top center"
             trace.textfont = dict(size=12, color=CHART_INK, family=CHART_FONT)
     apply_chart_theme(fig, height=250)
-    fig.update_layout(legend_title_text="", hovermode="x unified", margin=dict(l=16, r=16, t=38, b=8))
+    fig.update_layout(legend_title_text="", hovermode="x unified", margin=dict(l=16, r=16, t=44, b=8))
+    y_min = float(chart_df["사업체수"].min())
+    y_max = float(chart_df["사업체수"].max())
+    if y_max > y_min:
+        span = y_max - y_min
+        fig.update_yaxes(range=[max(0, y_min - span * 0.12), y_max + span * 0.30])
+    else:
+        fig.update_yaxes(range=[0, y_max * 1.3 if y_max > 0 else 1])
     st.plotly_chart(fig, width="stretch")
 
 
@@ -1422,28 +1468,34 @@ def support_status(conclusion: str) -> tuple[str, str]:
     return "제한적", "status-limited"
 
 
-def render_hypothesis_cards() -> None:
-    """Render compact live H1-H8 summary cards."""
+HYP_STATUS_DOT = {"지지": "🟢", "부분지지": "🟡", "제한적": "🔴", "탐색적": "🔵"}
+
+
+def render_hypothesis_cards() -> str:
+    """Render 8 clickable H1-H8 cards and return the selected hypothesis number."""
     summary = build_hypothesis_summary_live()
-    cols = st.columns(4)
-    for idx, row in summary.iterrows():
-        label, css = support_status(str(row["결론"]))
-        if row["결론"] == "탐색적":
-            label, css = "탐색적", "status-limited"
-        with cols[idx % 4]:
-            st.markdown(
-                f"""
-                <div class="info-card" style="padding:0.9rem 1rem;margin-bottom:0.8rem;min-height:150px;">
-                  <div style="display:flex;justify-content:space-between;gap:0.5rem;align-items:center;">
-                    <b style="color:#1d4ed8;">{row['가설']}</b>
-                    <span class="status-chip {css}">{label}</span>
-                  </div>
-                  <div style="font-size:0.84rem;font-weight:650;color:#111827;margin:0.65rem 0;">{row['한줄']}</div>
-                  <div style="font-size:0.76rem;color:#64748b;">{row['통계']}</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+    if "selected_hyp" not in st.session_state:
+        st.session_state["selected_hyp"] = "H1"
+    records = summary.to_dict("records")
+    for r in range(2):
+        cols = st.columns(4)
+        for c in range(4):
+            row = records[r * 4 + c]
+            h = row["가설"]
+            label, _ = support_status(str(row["결론"]))
+            if row["결론"] == "탐색적":
+                label = "탐색적"
+            dot = HYP_STATUS_DOT.get(label, "⚪")
+            is_selected = st.session_state["selected_hyp"] == h
+            if cols[c].button(
+                f"{h} · {dot} {label}\n\n{row['한줄']}",
+                key=f"hyp_btn_{h}",
+                use_container_width=True,
+                type="primary" if is_selected else "secondary",
+            ):
+                st.session_state["selected_hyp"] = h
+                st.rerun()
+    return st.session_state["selected_hyp"]
 
 
 def _significance_stars(p_value: float) -> str:
@@ -1866,11 +1918,10 @@ def render_hypothesis_mode() -> None:
     """Render the replacement H1-H8 flow."""
     st.markdown('<div class="section-title">새 H1~H8 가설 검증</div>', unsafe_allow_html=True)
     st.markdown(
-        '<p class="section-sub">단일효과 → 요인경합 → 산업별 조건 → 지역 편중 → 유치 후보 순서입니다. 회귀는 시도 N=17, 시군구는 지도 전용입니다.</p>',
+        '<p class="section-sub">아래 8개 카드를 클릭하면 선택한 가설의 상세 결과가 표시됩니다. 회귀는 시도 N=17, 시군구는 지도 전용입니다.</p>',
         unsafe_allow_html=True,
     )
-    render_hypothesis_cards()
-    selected = st.radio("상세 가설", [f"H{i}" for i in range(1, 9)], horizontal=True, key="hypothesis_selector")
+    selected = render_hypothesis_cards()
     render_selected_hypothesis(selected)
     render_data_sources()
 
