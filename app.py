@@ -112,14 +112,14 @@ ROLE_HYPOTHESIS_ORDER = [
 ]
 
 MAJOR_SITES = [
-    {"기업": "삼성전자 평택캠퍼스", "산업": "반도체·전자", "역할": "power_intensive", "가설": "H3", "lat": 37.0621, "lng": 127.0574},
-    {"기업": "SK하이닉스 이천", "산업": "반도체·전자", "역할": "power_intensive", "가설": "H3", "lat": 37.2524, "lng": 127.4890},
-    {"기업": "현대자동차 울산공장", "산업": "자동차", "역할": "heavy_export", "가설": "H1", "lat": 35.5384, "lng": 129.3718},
-    {"기업": "포스코 포항제철소", "산업": "1차금속", "역할": "heavy_export", "가설": "H1", "lat": 36.0030, "lng": 129.3887},
-    {"기업": "HD현대중공업 울산", "산업": "조선·기타운송장비", "역할": "heavy_export", "가설": "H1", "lat": 35.5146, "lng": 129.4386},
-    {"기업": "삼성중공업 거제조선소", "산업": "조선·기타운송장비", "역할": "heavy_export", "가설": "H1", "lat": 34.8922, "lng": 128.6066},
-    {"기업": "LG화학 여수공장", "산업": "석유화학", "역할": "heavy_export", "가설": "H1", "lat": 34.8377, "lng": 127.7314},
-    {"기업": "롯데케미칼 대산공장", "산업": "석유화학", "역할": "heavy_export", "가설": "H1", "lat": 36.9964, "lng": 126.3868},
+    {"기업": "삼성전자 평택캠퍼스", "라벨": "삼성전자 평택", "산업": "반도체·전자", "역할": "power_intensive", "가설": "H3", "lat": 37.0621, "lng": 127.0574},
+    {"기업": "SK하이닉스 이천", "라벨": "SK하이닉스 이천", "산업": "반도체·전자", "역할": "power_intensive", "가설": "H3", "lat": 37.2524, "lng": 127.4890},
+    {"기업": "현대자동차 울산공장", "라벨": "현대차 울산", "산업": "자동차", "역할": "heavy_export", "가설": "H1", "lat": 35.5384, "lng": 129.3718},
+    {"기업": "포스코 포항제철소", "라벨": "포스코 포항", "산업": "1차금속", "역할": "heavy_export", "가설": "H1", "lat": 36.0030, "lng": 129.3887},
+    {"기업": "HD현대중공업 울산", "라벨": "HD현대重 울산", "산업": "조선·기타운송장비", "역할": "heavy_export", "가설": "H1", "lat": 35.5146, "lng": 129.4386},
+    {"기업": "삼성중공업 거제조선소", "라벨": "삼성重 거제", "산업": "조선·기타운송장비", "역할": "heavy_export", "가설": "H1", "lat": 34.8922, "lng": 128.6066},
+    {"기업": "LG화학 여수공장", "라벨": "LG화학 여수", "산업": "석유화학", "역할": "heavy_export", "가설": "H1", "lat": 34.8377, "lng": 127.7314},
+    {"기업": "롯데케미칼 대산공장", "라벨": "롯데케미칼 대산", "산업": "석유화학", "역할": "heavy_export", "가설": "H1", "lat": 36.9964, "lng": 126.3868},
 ]
 
 CHART_FONT = "Apple SD Gothic Neo, Pretendard, Malgun Gothic, sans-serif"
@@ -569,7 +569,7 @@ def sorted_by_sido(df: pd.DataFrame) -> pd.DataFrame:
 @st.cache_data(show_spinner=False)
 def load_integrated_df() -> pd.DataFrame:
     """Load 2024 integrated data and dashboard helper columns."""
-    df = pd.read_excel(DATA_DIR / "07_통합_분석DF_2024.xlsx", sheet_name="통합DF")
+    df = pd.read_excel(DATA_DIR / "07_통합분석_2024.xlsx", sheet_name="통합DF")
     df["시도"] = df["시도"].map(short_sido)
     for col in ["하역능력_합계", "물동량_2023_톤", "무역항수", "IC수"]:
         if col in df.columns:
@@ -583,8 +583,7 @@ def load_integrated_df() -> pd.DataFrame:
 @st.cache_data(show_spinner=False)
 def load_y_panel() -> pd.DataFrame:
     """Load 2020-2024 long panel data."""
-    path = next(DATA_DIR.glob("02_Y_*long.xlsx"))
-    df = pd.read_excel(path)
+    df = pd.read_excel(DATA_DIR / "02_사업체수_패널.xlsx")
     df["시도"] = df["시도"].map(short_sido)
     return df
 
@@ -592,7 +591,7 @@ def load_y_panel() -> pd.DataFrame:
 @st.cache_data(show_spinner=False)
 def load_industry_mapping() -> pd.DataFrame:
     """Load industry roles and sorting metadata."""
-    df = pd.read_excel(DATA_DIR / "01_산업매핑_71중분류_to_26그룹.xlsx")
+    df = pd.read_excel(DATA_DIR / "01_산업매핑.xlsx")
     df = df[["분석그룹", "축_역할"]].drop_duplicates().copy()
     df["role_order"] = df["축_역할"].map({role: idx for idx, role in enumerate(ROLE_ORDER)}).fillna(99)
     return df.sort_values(["role_order", "분석그룹"]).reset_index(drop=True)
@@ -601,7 +600,7 @@ def load_industry_mapping() -> pd.DataFrame:
 @st.cache_data(show_spinner=False)
 def load_geojson_dict() -> dict:
     """Load province GeoJSON as a plain dict with normalized 시도 names."""
-    with open(DATA_DIR / "지도_시도.json", encoding="utf-8") as f:
+    with open(DATA_DIR / "지도_시도경계.json", encoding="utf-8") as f:
         geo = json.load(f)
     valid: list[dict] = []
     for feature in geo.get("features", []):
@@ -619,7 +618,7 @@ def load_geojson_dict() -> dict:
 @st.cache_data(show_spinner=False)
 def load_sigungu_factors() -> pd.DataFrame:
     """Load 229-city/county location factors for maps and context only."""
-    path = DATA_DIR / "시군구_4요인_통합.csv"
+    path = DATA_DIR / "시군구_입지요인.csv"
     df = pd.read_csv(path, encoding="utf-8-sig")
     df["시도"] = df["시도"].map(short_sido)
     df["지도키"] = df["시도"].astype(str) + "|" + df["시군구"].astype(str)
@@ -629,7 +628,7 @@ def load_sigungu_factors() -> pd.DataFrame:
 @st.cache_data(show_spinner=False)
 def load_sigungu_geojson_dict() -> dict:
     """Load simplified city/county boundaries and attach a normalized map key."""
-    path = DATA_DIR / "시군구_경계_simplified.geojson"
+    path = DATA_DIR / "시군구_경계.geojson"
     with open(path, encoding="utf-8") as file:
         geo = json.load(file)
     for feature in geo.get("features", []):
@@ -924,23 +923,37 @@ def add_vertical_legend(
 
 
 def add_major_site_markers(fmap: folium.Map) -> None:
-    """Add major industrial sites linked to H1 or H3."""
+    """Add major industrial sites with an always-on, styled name label (no hover needed)."""
     layer = folium.FeatureGroup(name="주요 대기업 사업장", show=True)
     for site in MAJOR_SITES:
         color = ROLE_COLORS.get(site["역할"], "#1d4ed8")
         folium.CircleMarker(
             location=[site["lat"], site["lng"]],
-            radius=6,
+            radius=5,
             color="#ffffff",
             weight=1.5,
             fill=True,
             fill_color=color,
             fill_opacity=0.95,
-            tooltip=site["기업"],
             popup=(
                 f"<b>{site['기업']}</b><br>{site['산업']}<br>"
                 f"연결 가설: {site['가설']} · {ROLE_LABELS.get(site['역할'], '기타')}"
             ),
+        ).add_to(layer)
+        label_html = (
+            f'<div style="transform:translate(9px,-11px);display:inline-flex;align-items:center;gap:5px;'
+            f'white-space:nowrap;background:rgba(255,255,255,0.96);border:1px solid {color};'
+            f'border-left:4px solid {color};border-radius:7px;padding:2px 8px;'
+            f'box-shadow:0 1px 5px rgba(15,23,42,.18);'
+            f'font-family:Pretendard,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;'
+            f'font-size:11px;font-weight:700;color:#0f172a;letter-spacing:-0.01em;">'
+            f'<span style="width:7px;height:7px;border-radius:50%;background:{color};flex:none;"></span>'
+            f'{site["라벨"]}</div>'
+        )
+        folium.Marker(
+            location=[site["lat"], site["lng"]],
+            icon=folium.DivIcon(icon_size=(0, 0), icon_anchor=(0, 0), html=label_html),
+            tooltip=f"{site['기업']} · {site['산업']}",
         ).add_to(layer)
     layer.add_to(fmap)
 
@@ -1042,7 +1055,7 @@ def make_industry_map(selected_sido: str, selected_target: str, target_level: st
         }
 
     tooltip_fields = ["시도", "대상", share_col]
-    tooltip_aliases = ["시도", "산업/역할", "사업체 비중"]
+    tooltip_aliases = ["시도", "산업", "사업체 비중"]
     if count_col:
         tooltip_fields.insert(2, "사업체수")
         tooltip_aliases.insert(2, "사업체수")
@@ -1379,8 +1392,8 @@ def render_distribution_section() -> None:
         st.image(pair_image, width="stretch")
 
 
-def render_explore_mode(selected_sido: str, selected_target: str, target_level: str, sigungu_factor: str) -> None:
-    """Render exploration mode."""
+def render_explore_mode(selected_sido: str, selected_target: str) -> None:
+    """Render a compact one-screen exploration view — map, factor summary, top picks."""
     left, right = st.columns([3, 2])
     with left:
         st.markdown('<div class="section-title">시도별 산업 비중 지도</div>', unsafe_allow_html=True)
@@ -1388,31 +1401,12 @@ def render_explore_mode(selected_sido: str, selected_target: str, target_level: 
             f'<p class="section-sub">2024년 고정 · {selected_target} 사업체 비중 · 진할수록 집중도 높음</p>',
             unsafe_allow_html=True,
         )
-        render_badges("단계구분도", "공간")
-        st_folium(make_industry_map(selected_sido, selected_target, target_level), height=540, width=900, returned_objects=[])
+        st_folium(make_industry_map(selected_sido, selected_target, "26산업"), height=540, width=900, returned_objects=[])
     with right:
         st.markdown('<div class="section-title">입지요인 요약</div>', unsafe_allow_html=True)
         st.markdown(f'<p class="section-sub">{selected_sido} · 항만 · 도로 · 전력 · 임금</p>', unsafe_allow_html=True)
         render_factor_cards(selected_sido)
         render_matching_recommendation(selected_sido)
-
-    st.markdown('<div class="section-title">2020~2024 시계열 변화</div>', unsafe_allow_html=True)
-    st.markdown(
-        f'<p class="section-sub">{selected_sido} vs 17개 시도 평균</p>',
-        unsafe_allow_html=True,
-    )
-    render_badges("라인차트", "패널")
-    render_time_series(selected_sido, selected_target, target_level)
-
-    st.markdown('<div class="section-title">시군구 입지요인 지도</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="unit-note">회귀 분석은 시도 17개 단위로 수행합니다. 아래 시군구 229개 자료는 지도와 지역 맥락 설명에만 사용하며 산업 비중 회귀와 섞지 않습니다.</div>',
-        unsafe_allow_html=True,
-    )
-    render_badges("단계구분도", "공간")
-    st_folium(make_sigungu_factor_map(sigungu_factor), height=610, width=1200, returned_objects=[])
-    render_correlation_explorer()
-    render_distribution_section()
 
 
 def support_status(conclusion: str) -> tuple[str, str]:
@@ -1481,7 +1475,7 @@ def render_regression_scatter(
         y=0.98,
         xref="paper",
         yref="paper",
-        text=f"표준화β={result['표준화β']:.2f}{_significance_stars(result['p_value'])} · R²={result['R²']:.2f} · p={result['p_value']:.3f}",
+        text=f"표준화β={result['표준화β']:.2f} · R²={result['R²']:.2f} · p={result['p_value']:.3f}",
         showarrow=False,
         align="left",
         bgcolor="rgba(255,255,255,.9)",
@@ -1497,7 +1491,7 @@ def render_h4_wage_chart() -> None:
     targets = ["정보통신·IT", "금융·보험", "전문·과학·기술", "의료정밀·전기·기계", "섬유·의복·가죽", "목재·종이·인쇄"]
     plot_df = results[(results["요인"] == "임금") & results["대상"].isin(targets)].copy()
     plot_df["유의도"] = np.where(plot_df["p_value"] < 0.05, "유의(p<0.05)", "비유의")
-    plot_df["표시"] = plot_df.apply(lambda row: f"{row['표준화β']:+.2f}{_significance_stars(row['p_value'])}", axis=1)
+    plot_df["표시"] = plot_df.apply(lambda row: f"{row['표준화β']:+.2f}", axis=1)
     plot_df = plot_df.sort_values("표준화β")
     render_badges("막대그래프", "회귀")
     fig = px.bar(
@@ -1539,15 +1533,12 @@ def render_factor_competition_chart() -> None:
 
 
 def render_beta_heatmap() -> None:
-    """Render H6 standardized beta heatmap with nonsignificant cells masked."""
-    level = st.radio("히트맵 보기", ["6역할", "26산업"], horizontal=True, key="h6_level")
-    source_level = "역할" if level == "6역할" else "산업"
-    results = build_beta_results(source_level)
-    order = list(ROLE_LABELS.values()) if source_level == "역할" else get_industries()
+    """Render the H6 standardized-beta heatmap for all 26 industries with every cell labeled."""
+    results = build_beta_results("산업")
+    order = get_industries()
     beta = results.pivot(index="대상", columns="요인", values="표준화β").reindex(order)[list(FACTOR_COLUMNS)]
     pvals = results.pivot(index="대상", columns="요인", values="p_value").reindex(order)[list(FACTOR_COLUMNS)]
     fdr = results.pivot(index="대상", columns="요인", values="p_FDR").reindex(order)[list(FACTOR_COLUMNS)]
-    masked = beta.where(fdr < 0.05)
     text = np.empty(beta.shape, dtype=object)
     hover = np.empty(beta.shape, dtype=object)
     for row_idx, target in enumerate(beta.index):
@@ -1555,12 +1546,12 @@ def render_beta_heatmap() -> None:
             value = beta.loc[target, factor]
             p_value = pvals.loc[target, factor]
             q_value = fdr.loc[target, factor]
-            text[row_idx, col_idx] = f"{value:+.2f}{_significance_stars(q_value)}" if q_value < 0.05 else "회색"
+            text[row_idx, col_idx] = "" if pd.isna(value) else f"{value:+.2f}"
             hover[row_idx, col_idx] = f"{target}<br>{factor}<br>표준화β={value:+.3f}<br>p={p_value:.4f}<br>FDR q={q_value:.4f}"
     render_badges("히트맵", "회귀")
     fig = go.Figure(
         go.Heatmap(
-            z=masked.to_numpy(),
+            z=beta.to_numpy(),
             x=beta.columns,
             y=beta.index,
             zmin=-1,
@@ -1570,6 +1561,7 @@ def render_beta_heatmap() -> None:
             reversescale=True,
             text=text,
             texttemplate="%{text}",
+            textfont=dict(size=12),
             customdata=hover,
             hovertemplate="%{customdata}<extra></extra>",
             colorbar=dict(title="표준화 β"),
@@ -1577,18 +1569,15 @@ def render_beta_heatmap() -> None:
             ygap=2,
         )
     )
-    fig.update_layout(
-        title="H6 산업 × 입지요인 표준화 β · FDR 비유의 셀은 회색 마스킹",
-        plot_bgcolor="#d1d5db",
-        height=460 if level == "6역할" else 920,
-    )
-    apply_chart_theme(fig, height=460 if level == "6역할" else 920, show_legend=False)
+    fig.update_layout(title="H6 산업 × 입지요인 표준화 β · 26개 산업 전체 셀 표시", height=920)
+    apply_chart_theme(fig, height=920, show_legend=False)
     fig.update_xaxes(side="top", title="")
     fig.update_yaxes(title="", autorange="reversed")
     st.plotly_chart(fig, width="stretch")
     significant = int((fdr < 0.05).sum().sum())
     st.info(
-        f"결론: {level} 기준 FDR q<0.05인 셀은 {significant}/{beta.size}개이며, "
+        f"결론: 26개 산업 × 4개 요인 {beta.size}개 셀의 표준화 β를 모두 표시했습니다. "
+        f"이 중 통계적으로 유의한(FDR q<0.05) 셀은 {significant}개이며, "
         "산업별로 대표 입지요인이 서로 갈리는 연관성 패턴이 나타납니다."
     )
 
@@ -1648,7 +1637,7 @@ def make_concentration_map(target: str, target_level: str) -> folium.Map:
         style_function=style,
         tooltip=folium.GeoJsonTooltip(
             fields=["시도", "대상", "사업체수", "전국비중"],
-            aliases=["시도", "산업/역할", "사업체수", "전국 사업체 비중"],
+            aliases=["시도", "산업", "사업체수", "전국 사업체 비중"],
             localize=True,
         ),
     ).add_to(fmap)
@@ -1666,13 +1655,11 @@ def make_concentration_map(target: str, target_level: str) -> folium.Map:
 
 def render_h7_concentration() -> None:
     """Render province industry concentration and contextual city/county factors."""
-    c1, c2, c3 = st.columns([1, 1.5, 1.5])
+    level = "26산업"
+    c1, c2 = st.columns([2, 1.5])
     with c1:
-        level = st.selectbox("분포 단위", ["6역할", "26산업"], key="h7_level")
-    options = list(ROLE_LABELS.values()) if level == "6역할" else get_industries()
+        target = st.selectbox("산업", get_industries(), key="h7_target")
     with c2:
-        target = st.selectbox("산업/역할", options, key="h7_target")
-    with c3:
         factor = st.selectbox("시군구 보완 요인", list(SIGUNGU_FACTOR_COLUMNS), key="h7_factor")
     df = load_analysis_df()
     count_col = _target_count_column(level, target)
@@ -1737,10 +1724,10 @@ def make_residual_map(residuals: pd.DataFrame, target: str) -> folium.Map:
 
 def render_h8_candidates() -> None:
     """Render predicted-minus-actual attraction candidates."""
-    level = st.radio("유치 후보 대상", ["6역할", "26산업"], horizontal=True, key="h8_level")
-    options = list(ROLE_LABELS.values()) if level == "6역할" else get_industries()
-    default = options.index("전력집약") if "전력집약" in options else 0
-    target = st.selectbox("산업/역할 선택", options, index=default, key="h8_target")
+    level = "26산업"
+    options = get_industries()
+    default = options.index("반도체·전자") if "반도체·전자" in options else 0
+    target = st.selectbox("산업 선택", options, index=default, key="h8_target")
     y_col = _target_column(level, target)
     model, residuals = fit_multifactor_regression(load_analysis_df(), y_col)
     candidates = residuals.sort_values("유치여지", ascending=False).reset_index(drop=True)
@@ -1805,6 +1792,72 @@ def render_selected_hypothesis(h_num: str) -> None:
     st.success(f"한 줄 결론: {row['결론문']} 인과가 아니라 연관성·패턴으로 해석합니다.")
 
 
+DATA_SOURCES = [
+    ("종속변수 Y · 사업체수", "통계청 KOSIS 전국사업체조사 (DT_1K52F01, 산업 중분류)", "2020~2024"),
+    ("H1 항만 · 하역능력/무역항수", "해양수산부 항만정보 (data.go.kr/15088273)", "2023"),
+    ("H1 항만 · 물동량", "해양수산부 항만별 물동량 통계", "2023"),
+    ("H2 고속도로 IC", "한국도로공사 IC 위치 (data.go.kr/15112762)", "2024"),
+    ("H3 산업용 전력", "한국전력거래소 EPSIS (data.go.kr/15054416)", "2020~2024"),
+    ("H4 평균임금", "고용노동부 사업체노동력조사 (data.go.kr/3069922)", "2020~2024"),
+    ("산업분류 매핑", "통계청 한국표준산업분류(KSIC) · 71 중분류→26 분석그룹", "—"),
+    ("시도 경계 지도", "southkorea-maps 행정구역 GeoJSON (KOSTAT 2018)", "2018"),
+]
+
+SIGUNGU_SOURCES = [
+    ("시군구 산업용 전력", "한국전력공사(KEPCO) 시군구별 전력판매량(산업용)", "2023~2024"),
+    ("시군구 평균급여", "국세청 시·군·구별 근로소득 연말정산(주소지 기준)", "2023"),
+    ("시군구 IC·항만거리·면적", "한국도로공사 IC 좌표 + 해수부 무역항 + southkorea-maps 2018 경계", "2018~2024"),
+]
+
+DATASET_FILES = [
+    ("07_통합분석_2024.xlsx", "회귀 메인 입력 · 17 시도 × 68 변수", "시도"),
+    ("02_사업체수_패널.xlsx", "5년 패널 사업체수 (2,210행)", "시도×연도"),
+    ("02_사업체수_2024.xlsx", "2024 단년 사업체수 (17×28)", "시도"),
+    ("01_산업매핑.xlsx", "KSIC 71 중분류 → 26 분석그룹 매핑", "산업분류"),
+    ("03_H1_항만.xlsx", "항만수·하역능력·물동량", "시도"),
+    ("04_H2_IC.xlsx", "면적·IC수·IC밀도", "시도"),
+    ("05_H3_전력.xlsx", "5년치 산업용 전력 + log 변환", "시도"),
+    ("06_H4_임금.xlsx", "5년치 평균임금", "시도"),
+    ("시군구_입지요인.csv", "229 시군구 × 4요인 (지도 전용)", "시군구"),
+    ("시군구_경계.geojson", "시군구 경계 (지도 전용)", "시군구"),
+    ("지도_시도경계.json", "시도 경계 GeoJSON", "시도"),
+]
+
+
+def render_data_sources() -> None:
+    """Render data sources and dataset list at the bottom of the hypothesis tab."""
+    st.markdown('<div class="section-title">사용된 자료 출처 · 데이터셋 목록</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="section-sub">회귀 본체는 시도 N=17 자료, 시군구 자료는 지도·맥락 설명 전용입니다. '
+        '모든 출처는 공개 통계(KOSIS·data.go.kr 등)입니다.</p>',
+        unsafe_allow_html=True,
+    )
+    tab1, tab2, tab3 = st.tabs(["원본 자료 출처", "시군구 보조 자료", "데이터셋 파일"])
+    with tab1:
+        st.dataframe(
+            pd.DataFrame(DATA_SOURCES, columns=["항목", "출처", "기준연도"]),
+            width="stretch",
+            hide_index=True,
+        )
+    with tab2:
+        st.dataframe(
+            pd.DataFrame(SIGUNGU_SOURCES, columns=["항목", "출처", "기준연도"]),
+            width="stretch",
+            hide_index=True,
+        )
+        st.caption("Y(사업체수)가 시군구×산업 중분류로 공개되지 않아, 시군구 4요인은 회귀가 아닌 지도 시각화에만 사용합니다.")
+    with tab3:
+        st.dataframe(
+            pd.DataFrame(DATASET_FILES, columns=["파일", "내용", "분석단위"]),
+            width="stretch",
+            hide_index=True,
+        )
+    st.caption(
+        "강건성 참고: 5년 패널 고정효과(FE) 보조검증은 results/tables/h7_panel.xlsx에 포함되며, "
+        "항만·IC는 시점불변이라 시도 FE에서 제외됩니다. 모든 결과는 인과가 아니라 연관성·패턴으로 해석합니다."
+    )
+
+
 def render_hypothesis_mode() -> None:
     """Render the replacement H1-H8 flow."""
     st.markdown('<div class="section-title">새 H1~H8 가설 검증</div>', unsafe_allow_html=True)
@@ -1815,15 +1868,7 @@ def render_hypothesis_mode() -> None:
     render_hypothesis_cards()
     selected = st.radio("상세 가설", [f"H{i}" for i in range(1, 9)], horizontal=True, key="hypothesis_selector")
     render_selected_hypothesis(selected)
-    with st.expander("부록 · 5년 패널 고정효과 강건성"):
-        panel_path = TABLES_DIR / "h7_panel.xlsx"
-        if panel_path.exists():
-            comparison = pd.read_excel(panel_path, sheet_name="단년_vs_패널")
-            robust = int(comparison["강건"].sum()) if "강건" in comparison else 0
-            st.write(f"기존 패널 FE 보조검증: 강건 효과 {robust}/{len(comparison)}개.")
-            st.caption("항만·IC는 시점불변이라 시도 고정효과에서 제외되며, 이 결과도 인과가 아니라 강건성 참고자료입니다.")
-        else:
-            st.caption("패널 결과 파일이 없어 부록을 표시하지 못했습니다.")
+    render_data_sources()
 
 
 def top_real_sidos_for_recommendations(top_industries: list[str]) -> str:
@@ -2089,7 +2134,7 @@ def render_simulator_mode() -> None:
     st.caption("시뮬레이터는 17개 시도 단위 회귀계수 기반 정책 데모입니다. 세부 부지 선정에는 토지·규제·인력·공급망 자료가 추가로 필요합니다.")
 
 
-def render_sidebar() -> tuple[str, str, str, str, str]:
+def render_sidebar() -> tuple[str, str, str]:
     """Render mode control and expose filters only in Explore mode."""
     st.sidebar.markdown('<div class="sidebar-title">Mode</div>', unsafe_allow_html=True)
     mode = st.sidebar.radio(
@@ -2100,37 +2145,29 @@ def render_sidebar() -> tuple[str, str, str, str, str]:
     )
 
     selected_sido = "경기"
-    target_level = "6역할"
-    selected_target = "전력집약"
-    sigungu_factor = "산업용 전력"
+    selected_target = "반도체·전자"
     if mode == "탐색":
         st.sidebar.markdown('<div class="sidebar-title" style="margin-top:1.3rem">Filter</div>', unsafe_allow_html=True)
         selected_sido = st.sidebar.selectbox("시도", SIDO_ORDER, index=SIDO_ORDER.index("경기"))
-        target_level = st.sidebar.radio("산업 보기", ["6역할", "26산업"], horizontal=True)
-        if target_level == "6역할":
-            targets = list(ROLE_LABELS.values())
-            default_idx = targets.index("전력집약")
-        else:
-            targets = get_industries()
-            default_idx = targets.index("반도체·전자") if "반도체·전자" in targets else 0
-        selected_target = st.sidebar.selectbox("산업/역할", targets, index=default_idx)
-        sigungu_factor = st.sidebar.selectbox("시군구 지도 요인", list(SIGUNGU_FACTOR_COLUMNS), index=2)
+        industries = get_industries()
+        default_idx = industries.index("반도체·전자") if "반도체·전자" in industries else 0
+        selected_target = st.sidebar.selectbox("산업", industries, index=default_idx)
         st.sidebar.caption("산업 지도 기준연도: 2024년 고정")
 
     st.sidebar.markdown('<div class="sidebar-title" style="margin-top:1.5rem">Team</div>', unsafe_allow_html=True)
     st.sidebar.caption("팀 푸바오 · 아주대 융합시스템공학과")
     st.sidebar.caption("이동혁 · 서찬 · 박현민 · 정현문")
-    return mode, selected_sido, target_level, selected_target, sigungu_factor
+    return mode, selected_sido, selected_target
 
 
 def main() -> None:
     """Run the Streamlit dashboard."""
     inject_css()
     render_header()
-    mode, selected_sido, target_level, selected_target, sigungu_factor = render_sidebar()
+    mode, selected_sido, selected_target = render_sidebar()
 
     if mode == "탐색":
-        render_explore_mode(selected_sido, selected_target, target_level, sigungu_factor)
+        render_explore_mode(selected_sido, selected_target)
     elif mode == "가설 결과":
         render_hypothesis_mode()
     else:
