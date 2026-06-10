@@ -797,6 +797,8 @@ def build_hypothesis_summary_live() -> pd.DataFrame:
     h1 = fit_simple_regression(df, "역할비중_heavy_export", FACTOR_COLUMNS["항만"])
     h2 = fit_simple_regression(df, "역할비중_logistics", FACTOR_COLUMNS["IC"])
     h3 = fit_simple_regression(df, "비중_반도체·전자", FACTOR_COLUMNS["전력"])
+    h3_metal = fit_simple_regression(df, "비중_1차금속", FACTOR_COLUMNS["전력"])
+    h3_petro = fit_simple_regression(df, "비중_석유화학", FACTOR_COLUMNS["전력"])
     h4_capital = fit_simple_regression(df, "역할비중_capital_intensive", FACTOR_COLUMNS["임금"])
     h4_labor = fit_simple_regression(df, "비중_섬유·의복·가죽", FACTOR_COLUMNS["임금"])
     h5 = build_factor_competition().iloc[0]
@@ -839,9 +841,9 @@ def build_hypothesis_summary_live() -> pd.DataFrame:
             {
                 "가설": "H3",
                 "한줄": "산업용 전력이 많을수록 반도체·전자 비중이 높다",
-                "통계": f"표준화β={h3['표준화β']:.2f}, R²={h3['R²']:.2f}, p={h3['p_value']:.3f}",
+                "통계": f"반도체 R²={h3['R²']:.2f}(p={h3['p_value']:.2f}) · 1차금속 R²={h3_metal['R²']:.2f}(p={h3_metal['p_value']:.3f}) · 석유화학 R²={h3_petro['R²']:.2f}(p={h3_petro['p_value']:.3f})",
                 "결론": support(h3),
-                "결론문": "전력과 반도체·전자 비중은 양의 패턴이나 통계적 강도는 제한적이다.",
+                "결론문": "전력은 1차금속·석유화학 등 중화학 제조와 강하게(R² 40%대·유의) 연관되지만, 가설이 지목한 반도체·전자와는 약하다(R² 13%·비유의). 총 산업용 전력이 중화학 제조 수요를 함께 반영하기 때문이다.",
             },
             {
                 "가설": "H4",
@@ -853,9 +855,9 @@ def build_hypothesis_summary_live() -> pd.DataFrame:
             {
                 "가설": "H5",
                 "한줄": "항만·IC·전력·임금 중 산업 입지를 가장 잘 설명하는 요인은 다르다",
-                "통계": f"1위 {h5['요인']} · 평균 R²={h5['평균_R²']:.2f} · 유의산업 {int(h5['유의산업수'])}개",
+                "통계": f"26산업 평균 1위 {h5['요인']} · 평균 R²={h5['평균_R²']:.2f} · 유의산업 {int(h5['유의산업수'])}개",
                 "결론": "지지",
-                "결론문": "4요인의 설명력 순위가 뚜렷하게 갈리는 연관성 패턴이 나타났다.",
+                "결론문": "26개 산업 평균 설명력은 전력이 1위다(전력>IC>항만>임금). 다만 단일 최강 관계는 IC→물류(R² 74%)이므로 '평균 설명력 1위'와 '단일 최강 관계'는 서로 다른 질문이다.",
             },
             {
                 "가설": "H6",
@@ -1568,6 +1570,42 @@ def render_h4_wage_chart() -> None:
     st.plotly_chart(fig, width="stretch")
 
 
+def render_h3_power_comparison() -> None:
+    """Compare industrial-electricity explanatory power: heavy-chemical vs semiconductor."""
+    df = load_analysis_df()
+    targets = [("1차금속", "중화학"), ("석유화학", "중화학"), ("반도체·전자", "반도체")]
+    rows = []
+    for industry, group in targets:
+        result = fit_simple_regression(df, f"비중_{industry}", FACTOR_COLUMNS["전력"])
+        rows.append({
+            "산업": f"{industry}\n({group})",
+            "R²": result["R²"],
+            "유의도": "유의(p<0.05)" if result["p_value"] < 0.05 else "비유의",
+            "표시": f"R²={result['R²']:.0%} · β={result['표준화β']:.2f} · p={result['p_value']:.3f}",
+        })
+    plot_df = pd.DataFrame(rows).sort_values("R²")
+    render_badges("막대그래프", "회귀")
+    fig = px.bar(
+        plot_df,
+        x="R²",
+        y="산업",
+        color="유의도",
+        orientation="h",
+        text="표시",
+        color_discrete_map={"유의(p<0.05)": "#1d4ed8", "비유의": "#cbd5e1"},
+        title="H3 산업용 전력의 산업별 설명력 — 중화학은 강하고 반도체는 약함",
+    )
+    apply_chart_theme(fig, height=430)
+    fig.update_layout(legend_title_text="통계적 유의도")
+    fig.update_xaxes(title="전력 → 산업 비중 단순회귀 R²", tickformat=".0%")
+    fig.update_yaxes(title="")
+    st.plotly_chart(fig, width="stretch")
+    st.caption(
+        "가설은 전력→반도체·전자를 지목하지만, 17개 시도 회귀에서는 1차금속·석유화학(중화학)이 "
+        "전력과 더 강하게 연관되고 반도체·전자는 비유의합니다. 총 산업용 전력이 중화학 제조 수요를 함께 반영하기 때문입니다."
+    )
+
+
 def render_factor_competition_chart() -> None:
     """Render H5 four-factor explanatory-strength ranking."""
     competition = build_factor_competition().sort_values("평균_R²")
@@ -1586,6 +1624,11 @@ def render_factor_competition_chart() -> None:
     fig.update_xaxes(title="26개 산업 단순회귀 평균 R²")
     fig.update_yaxes(title="")
     st.plotly_chart(fig, width="stretch")
+    st.caption(
+        "이 순위는 26개 산업 전체에 대한 '평균' 설명력입니다(전력 1위). "
+        "한편 '단일 최강' 관계는 IC→물류(R² 74%)로, PPT가 IC를 1등 요인으로 부른 근거가 이 지표입니다. "
+        "평균 설명력과 단일 최강 관계는 서로 다른 질문이라 결과가 갈립니다."
+    )
 
 
 def render_beta_heatmap() -> None:
@@ -1828,13 +1871,7 @@ def render_selected_hypothesis(h_num: str) -> None:
             y_label="물류 역할 비중 · 도매+소매+운송",
         )
     elif h_num == "H3":
-        render_regression_scatter(
-            y_col="비중_반도체·전자",
-            x_col=FACTOR_COLUMNS["전력"],
-            title="H3 산업용 전력과 반도체·전자 비중",
-            x_label="log 산업용 전력",
-            y_label="반도체·전자 사업체 비중",
-        )
+        render_h3_power_comparison()
     elif h_num == "H4":
         render_h4_wage_chart()
     elif h_num == "H5":

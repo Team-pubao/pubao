@@ -56,7 +56,7 @@ def save_h1_h4_scatter() -> Path:
     specs = [
         ("H1 항만", app.FACTOR_COLUMNS["항만"], "역할비중_heavy_export", "중량수출 비중"),
         ("H2 IC", app.FACTOR_COLUMNS["IC"], "역할비중_logistics", "물류 비중"),
-        ("H3 전력", app.FACTOR_COLUMNS["전력"], "비중_반도체·전자", "반도체·전자 비중"),
+        ("H3 전력", app.FACTOR_COLUMNS["전력"], "비중_1차금속", "1차금속 비중 · 중화학 대표(반도체는 R²13%로 약함)"),
         ("H4 임금", app.FACTOR_COLUMNS["임금"], "역할비중_capital_intensive", "자본집약 비중"),
     ]
     fig, axes = plt.subplots(2, 2, figsize=(13, 10), constrained_layout=True)
